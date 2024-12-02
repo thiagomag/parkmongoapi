@@ -1,9 +1,7 @@
 package com.fiap.parkmongoapi.model;
 
-
 import com.fiap.parkmongoapi.model.enums.EnumPerfil;
 import com.fiap.parkmongoapi.model.enums.EnumTipoVeiculo;
-import com.fiap.parkmongoapi.utils.VagaUtils;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -34,8 +32,9 @@ public class Vaga {
     @NotNull
     private Endereco endereco;
 
-    public Vaga(Endereco endereco, EnumPerfil perfil, EnumTipoVeiculo tipoVeiculo, BigDecimal tarifa) {
-        this.locId = VagaUtils.gerarIdCustomizado(endereco);
+
+    public Vaga(String locId, Endereco endereco, EnumPerfil perfil, EnumTipoVeiculo tipoVeiculo, BigDecimal tarifa) {
+        this.locId = locId;
         this.perfil = perfil;
         this.tipoVeiculo = tipoVeiculo;
         this.tarifa = tarifa;

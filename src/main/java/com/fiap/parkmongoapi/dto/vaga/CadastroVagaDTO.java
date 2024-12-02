@@ -63,9 +63,9 @@ public record CadastroVagaDTO(
         return new Endereco(cep, uf, cidade, bairro, logradouro);
     }
 
-    public Vaga toEntity() {
+    public Vaga toEntity(String locId) {
         Endereco endereco = toEndereco();
-        return new Vaga(endereco, perfil, tipoVeiculo, tarifa);
+        return new Vaga(locId ,endereco, perfil, tipoVeiculo, tarifa);
     }
 
 }

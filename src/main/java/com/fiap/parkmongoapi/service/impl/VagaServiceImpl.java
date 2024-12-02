@@ -6,6 +6,7 @@ import com.fiap.parkmongoapi.dto.vaga.CadastroVagaDTO;
 import com.fiap.parkmongoapi.dto.vaga.VagaFiltroDTO;
 import com.fiap.parkmongoapi.dto.vaga.VagaResponseDTO;
 
+import com.fiap.parkmongoapi.model.Endereco;
 import com.fiap.parkmongoapi.model.Vaga;
 import com.fiap.parkmongoapi.repository.VagaRepository;
 import com.fiap.parkmongoapi.service.VagaService;
@@ -19,8 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
-
 @Service
 public class VagaServiceImpl implements VagaService {
 
@@ -30,11 +29,16 @@ public class VagaServiceImpl implements VagaService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private VagaUtils vagaUtils;
 
     @Override
     public Vaga criarVaga(CadastroVagaDTO vaga) {
 
-        Vaga vagaCriada = vaga.toEntity();
+        Endereco enderecoVaga = vaga.toEndereco();
+        String locId = vagaUtils.gerarIdCustomizado(enderecoVaga);
+
+        Vaga vagaCriada = vaga.toEntity(locId);
         vagaCriada.setId(null);
 
         return vagaRepository.save(vagaCriada);
