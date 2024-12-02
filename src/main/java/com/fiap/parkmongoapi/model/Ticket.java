@@ -40,5 +40,7 @@ public class Ticket {
     @NotNull(message = "O status não pode ser nulo.")
     private EnumStatusTicket status;
 
+    private BigDecimal valor;
+
 
 }
