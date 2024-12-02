@@ -9,7 +9,7 @@ public interface VeiculoRepository extends MongoRepository<Veiculo,String> {
 
     public Optional<Veiculo> findByPlaca(String placa);
 
-    Optional<Veiculo> findByPlacaAndCpfMotorista(String placa, String cpfMotorista);
+    public Optional<Veiculo> findByPlacaAndCpfMotorista(String placa, String cpfMotorista);
 
 
 
