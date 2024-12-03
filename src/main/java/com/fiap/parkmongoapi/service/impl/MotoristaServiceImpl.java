@@ -7,6 +7,7 @@ import com.fiap.parkmongoapi.repository.MotoristaRepository;
 import com.fiap.parkmongoapi.service.MotoristaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -29,6 +30,7 @@ public class MotoristaServiceImpl implements MotoristaService {
         return motoristaRepository.save(motorista);
     }
 
+    @Override
     public Motorista atualizarMotorista(String cpf, Motorista motoristaAtualizado) {
         Motorista motoristaExistente = motoristaRepository.findById(cpf)
                 .orElseThrow(() -> new MotoristaNotFoundException("Motorista não encontrado com o CPF: " + cpf));
@@ -50,6 +52,7 @@ public class MotoristaServiceImpl implements MotoristaService {
         return motoristaRepository.save(motoristaExistente);
     }
 
+    @Transactional
     @Override
     public void deletarMotorista(String cpf) {
         Motorista motoristaExistente = motoristaRepository.findById(cpf)

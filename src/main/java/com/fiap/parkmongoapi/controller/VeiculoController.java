@@ -1,5 +1,6 @@
 package com.fiap.parkmongoapi.controller;
 
+import com.fiap.parkmongoapi.dto.PageResponseDTO;
 import com.fiap.parkmongoapi.dto.veiculo.AtualizaVeiculoDTO;
 import com.fiap.parkmongoapi.dto.veiculo.CadastroVeiculoDTO;
 import com.fiap.parkmongoapi.model.Motorista;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -76,6 +79,17 @@ public class VeiculoController {
 
         return ResponseEntity.noContent().build();}
 
+
+
+    @DeleteMapping("/motorista/{cpfMotorista}")
+    @Operation(summary = "Excluir todos os veículos de um motorista",
+            description = "Exclui todos os veículos associados a um CPF de motorista.")
+    public ResponseEntity<Void> deleteByCpfMotorista(@PathVariable String cpfMotorista) {
+        veiculoService.deleteByCpfMotorista(cpfMotorista);
+        return ResponseEntity.noContent().build();
+    }
+
+
     @GetMapping("/{placa}")
     @Operation(summary = "Consultar Veiculo por placa",
             description = "Retorna um veiculo com base na placa fornecido.")
@@ -99,6 +113,22 @@ public class VeiculoController {
 
         return ResponseEntity.ok(veiculo);
     }
+
+    @GetMapping("/motorista/{cpfMotorista}")
+    @Operation(summary = "Consultar Todos Veiculos de um motorista",
+            description = "Retorna todos os veiculos associados a um cpf de um motorista.")
+    public ResponseEntity<PageResponseDTO<Veiculo>>  consultarVeiculosPorMotorista(
+            @PathVariable String cpfMotorista,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        var veiculoPaginacao = this.veiculoService.consultarVeiculosPorMotorista(cpfMotorista,pageable);
+
+        return ResponseEntity.ok(veiculoPaginacao);
+    }
+
 
 
 

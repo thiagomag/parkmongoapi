@@ -1,6 +1,7 @@
 package com.fiap.parkmongoapi.service.impl;
 
 
+import com.fiap.parkmongoapi.dto.PageResponseDTO;
 import com.fiap.parkmongoapi.dto.veiculo.AtualizaVeiculoDTO;
 import com.fiap.parkmongoapi.exception.MotoristaNotFoundException;
 import com.fiap.parkmongoapi.exception.VeiculoNotFoundException;
@@ -10,8 +11,13 @@ import com.fiap.parkmongoapi.repository.MotoristaRepository;
 import com.fiap.parkmongoapi.repository.VeiculoRepository;
 import com.fiap.parkmongoapi.service.VeiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class VeiculoServiceImpl implements VeiculoService {
@@ -107,6 +113,21 @@ public class VeiculoServiceImpl implements VeiculoService {
         veiculoRepository.deleteById(veiculo.getId());
     }
 
+    @Transactional
+    @Override
+    public void deleteByCpfMotorista(String cpf) {
+
+        List<Veiculo> veiculos = veiculoRepository.findByCpfMotorista(cpf);
+
+        // Verifica se a lista de veículos está vazia
+        if (veiculos.isEmpty()) {
+            throw new VeiculoNotFoundException("Nenhum veículo encontrado para o motorista com o CPF: " + cpf);
+        }
+
+        veiculoRepository.deleteByCpfMotorista(cpf);
+
+    }
+
 
     @Override
     public Veiculo consultarVeiculoPorPlaca(String placa) {
@@ -123,4 +144,34 @@ public class VeiculoServiceImpl implements VeiculoService {
                 .orElseThrow(() -> new VeiculoNotFoundException(
                         "Veículo não encontrado com a placa: " + placa + " para o motorista de CPF: " + cpf));
     }
+
+    @Override
+    public PageResponseDTO<Veiculo> consultarVeiculosPorMotorista(
+            String cpfMotorista, Pageable pageable){
+
+
+        // Busca os veículos paginados
+        Page<Veiculo> veiculosPage = veiculoRepository.findByCpfMotorista(cpfMotorista, pageable).orElseThrow(
+                ()-> new MotoristaNotFoundException("Motorista não encontrado")
+        );
+
+        // Retorna a resposta com os dados da página
+        return new PageResponseDTO<>(
+                veiculosPage.getContent(),
+                veiculosPage.getTotalElements(),
+                veiculosPage.getTotalPages(),
+                veiculosPage.getNumber(),
+                veiculosPage.getSize()  );
+    }
 }
+
+
+
+
+
+
+
+
+
+
+

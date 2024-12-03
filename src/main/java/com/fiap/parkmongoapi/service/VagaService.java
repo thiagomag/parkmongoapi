@@ -20,9 +20,11 @@ public interface VagaService {
     public Vaga atualizarVaga(String id, AtualizaVagaDTO vagaAtualizada);
 
     // deleta tanto pelo locId quanto pelo id
-    void deletarVaga(String id);
+    public void deletarVaga(String id);
 
     public PageResponseDTO<VagaResponseDTO> buscarComFiltros(VagaFiltroDTO filtro, Pageable pageable);
+
+
 
 
 

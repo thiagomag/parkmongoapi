@@ -1,6 +1,7 @@
 package com.fiap.parkmongoapi.service.impl;
 
 import com.fiap.parkmongoapi.dto.ticket.CadastroTicketDTO;
+import com.fiap.parkmongoapi.dto.ticket.TicketViewDTO;
 import com.fiap.parkmongoapi.exception.TicketAlreadyPaidException;
 import com.fiap.parkmongoapi.exception.TicketNotFoundException;
 import com.fiap.parkmongoapi.model.Motorista;
@@ -15,6 +16,7 @@ import com.fiap.parkmongoapi.repository.VeiculoRepository;
 import com.fiap.parkmongoapi.service.TicketService;
 import com.fiap.parkmongoapi.utils.TicketUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -22,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+@Service
 public class TicketServiceImpl implements TicketService {
 
     @Autowired
@@ -91,7 +94,34 @@ public class TicketServiceImpl implements TicketService {
         return ticketRepository.save(ticket);
     }
 
+    public TicketViewDTO findTicketById(String ticketId) {
+        // Primeiro, encontramos o ticket pelo ID
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket não encontrado"));
 
+        // Buscando os dados relacionados (Motorista, Veículo, Vaga)
+        Motorista motorista = ticket.getMotorista();
+        Veiculo veiculo = ticket.getVeiculo();
+        Vaga vaga = ticket.getVaga();
 
-
+        // Mapear as informações para o DTO
+        return new TicketViewDTO(
+                ticket.getId(),
+                ticket.getInicio(),
+                ticket.getFim(),
+                ticket.getStatus(),
+                ticket.getValor(),
+                motorista.getCpf(),
+                motorista.getNome(),
+                veiculo.getPlaca(),
+                veiculo.getModelo(),
+                veiculo.getTipoVeiculo(),
+                vaga.getLocId(),
+                vaga.getTipoVeiculo(),
+                vaga.getEndereco()
+        );
+    }
 }
+
+
+
