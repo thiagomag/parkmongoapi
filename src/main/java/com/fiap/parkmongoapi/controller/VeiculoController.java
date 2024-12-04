@@ -1,9 +1,10 @@
 package com.fiap.parkmongoapi.controller;
 
 import com.fiap.parkmongoapi.dto.PageResponseDTO;
+import com.fiap.parkmongoapi.dto.motorista.MotoristaResponseDTO;
 import com.fiap.parkmongoapi.dto.veiculo.AtualizaVeiculoDTO;
 import com.fiap.parkmongoapi.dto.veiculo.CadastroVeiculoDTO;
-import com.fiap.parkmongoapi.model.Motorista;
+import com.fiap.parkmongoapi.dto.veiculo.VeiculoResponseDTO;
 import com.fiap.parkmongoapi.model.Veiculo;
 import com.fiap.parkmongoapi.service.VeiculoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +31,7 @@ public class VeiculoController {
 
     @PostMapping("/{cpfMotorista}")
     @Operation(summary = "Cadastrar Veiculos de Motorista", description = "Cadastra um novo veiculo vinculado a um cpf.")
-    public ResponseEntity<Motorista> cadastrarVeiculos(
+    public ResponseEntity<MotoristaResponseDTO> cadastrarVeiculos(
             @PathVariable
             @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
             String cpfMotorista,
@@ -44,6 +45,7 @@ public class VeiculoController {
         veiculo.setCpfMotorista(cpfMotorista);
 
         var motorista = veiculoService.cadastrarVeiculo(cpfMotorista,veiculo);
+        var dto = MotoristaResponseDTO.toDTO(motorista);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -51,19 +53,21 @@ public class VeiculoController {
                 .buildAndExpand(cpfMotorista, veiculo.getPlaca())
                 .toUri();
 
-        return ResponseEntity.created(location).body(motorista);
+        return ResponseEntity.created(location).body(dto);
     }
 
     @PutMapping("/{cpfMotorista}/{placa}")
     @Operation(summary = "Atualizar um o Veiculo de um Motorista por placa",
             description = "Retorna o Veiculo atualizado")
-    public ResponseEntity<Veiculo> atualizarVeiculo(
+    public ResponseEntity<VeiculoResponseDTO> atualizarVeiculo(
             @PathVariable String cpfMotorista,
             @PathVariable String placa,
             @RequestBody AtualizaVeiculoDTO veiculoAtualizado) {
 
         Veiculo veiculoAtualizadoResponse = veiculoService.atualizarVeiculo(cpfMotorista, placa, veiculoAtualizado);
-        return ResponseEntity.ok(veiculoAtualizadoResponse);
+        var dto = VeiculoResponseDTO.toDTO(veiculoAtualizadoResponse);
+
+        return ResponseEntity.ok(dto);
     }
 
 
@@ -71,7 +75,7 @@ public class VeiculoController {
     @DeleteMapping("/{cpfMotorista}/{placa}")
     @Operation(summary = "Deleta um o Veiculo de um Motorista por placa",
             description = "Deleta um Veiculo de um Motorista por placa")
-    public ResponseEntity<String> deletarVeiculo (
+    public ResponseEntity<Void> deletarVeiculo (
             @PathVariable String cpfMotorista,
             @PathVariable String placa){
 
@@ -93,31 +97,33 @@ public class VeiculoController {
     @GetMapping("/{placa}")
     @Operation(summary = "Consultar Veiculo por placa",
             description = "Retorna um veiculo com base na placa fornecido.")
-    public ResponseEntity<Veiculo> consultarVeiculoPorPlaca(
+    public ResponseEntity<VeiculoResponseDTO> consultarVeiculoPorPlaca(
             @PathVariable String placa){
 
         var veiculo = this.veiculoService.consultarVeiculoPorPlaca(placa);
+        var dto = VeiculoResponseDTO.toDTO(veiculo);
 
-        return ResponseEntity.ok(veiculo);
+        return ResponseEntity.ok(dto);
     }
 
 
     @GetMapping("/{cpfMotorista}/{placa}")
     @Operation(summary = "Consultar Veiculo de um motorista por placa",
             description = "Retorna um veiculo  de um motorista com base na placa fornecido.")
-    public ResponseEntity<Veiculo> consultarVeiculoPorPlacaEMotorista(
+    public ResponseEntity<VeiculoResponseDTO> consultarVeiculoPorPlacaEMotorista(
             @PathVariable String cpfMotorista,
             @PathVariable String placa){
 
         var veiculo = this.veiculoService.consultarVeiculoPorPlacaEMotorista(cpfMotorista,placa);
+        var dto = VeiculoResponseDTO.toDTO(veiculo);
 
-        return ResponseEntity.ok(veiculo);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/motorista/{cpfMotorista}")
     @Operation(summary = "Consultar Todos Veiculos de um motorista",
             description = "Retorna todos os veiculos associados a um cpf de um motorista.")
-    public ResponseEntity<PageResponseDTO<Veiculo>>  consultarVeiculosPorMotorista(
+    public ResponseEntity<PageResponseDTO<VeiculoResponseDTO>>  consultarVeiculosPorMotorista(
             @PathVariable String cpfMotorista,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
@@ -125,6 +131,7 @@ public class VeiculoController {
         Pageable pageable = PageRequest.of(page, size);
 
         var veiculoPaginacao = this.veiculoService.consultarVeiculosPorMotorista(cpfMotorista,pageable);
+
 
         return ResponseEntity.ok(veiculoPaginacao);
     }

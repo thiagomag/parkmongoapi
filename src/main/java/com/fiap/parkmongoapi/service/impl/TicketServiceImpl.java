@@ -1,7 +1,6 @@
 package com.fiap.parkmongoapi.service.impl;
 
-import com.fiap.parkmongoapi.dto.ticket.CadastroTicketDTO;
-import com.fiap.parkmongoapi.dto.ticket.TicketViewDTO;
+import com.fiap.parkmongoapi.dto.ticket.*;
 import com.fiap.parkmongoapi.exception.TicketAlreadyPaidException;
 import com.fiap.parkmongoapi.exception.TicketNotFoundException;
 import com.fiap.parkmongoapi.model.Motorista;
@@ -15,6 +14,8 @@ import com.fiap.parkmongoapi.repository.VagaRepository;
 import com.fiap.parkmongoapi.repository.VeiculoRepository;
 import com.fiap.parkmongoapi.service.TicketService;
 import com.fiap.parkmongoapi.utils.TicketUtils;
+import com.fiap.parkmongoapi.utils.VagaUtils;
+import com.fiap.parkmongoapi.utils.VeiculoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,16 +40,15 @@ public class TicketServiceImpl implements TicketService {
     @Autowired
     private VeiculoRepository veiculoRepository;
 
-    public Ticket cadastrarTicket(CadastroTicketDTO cadastroTicketDTO) {
-        // Valida as entradas e busca as entidades no banco
-        Vaga vaga = vagaRepository.findById(cadastroTicketDTO.vagaId())
-                .orElseThrow(() -> new RuntimeException("Vaga não encontrada"));
+    public TicketCreatedDTO cadastrarTicket(CadastroTicketDTO cadastroTicketDTO) {
 
-        Motorista motorista = motoristaRepository.findById(cadastroTicketDTO.motoristaId())
+        Vaga vaga = VagaUtils.buscarVagaPorIdentificador(cadastroTicketDTO.vagaId(), vagaRepository);
+
+        Motorista motorista = motoristaRepository.findById(cadastroTicketDTO.motoristacpf())
                 .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
 
-        Veiculo veiculo = veiculoRepository.findById(cadastroTicketDTO.veiculoId())
-                .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+        Veiculo veiculo = VeiculoUtils.buscarVeiculoPorIdOuPlaca(cadastroTicketDTO.veiculoPlaca(),
+                cadastroTicketDTO.motoristacpf(), veiculoRepository);
 
         // Converte a hora atual para o fuso horário de São Paulo
         ZonedDateTime saoPauloTime = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
@@ -63,11 +63,13 @@ public class TicketServiceImpl implements TicketService {
         ticket.setStatus(EnumStatusTicket.EM_ABERTO);
 
         // Salva o ticket no banco de dados
-        return ticketRepository.save(ticket);
+        ticketRepository.save(ticket);
+
+        return TicketCreatedDTO.toDto(ticket);
     }
 
     @Override
-    public Ticket pagarTicket(String ticketId) {
+    public TicketPaidDTO pagarTicket(String ticketId) {
         // Encontra o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket não encontrado"));
@@ -86,13 +88,44 @@ public class TicketServiceImpl implements TicketService {
         BigDecimal valorPagamento = TicketUtils.getValorPagamento(duration, ticket);
 
         // Atualiza o ticket com a hora de fechamento, o valor calculado e a data do pagamento
-        ticket.setFim(agora);  // Define a hora de fim
-        ticket.setStatus(EnumStatusTicket.PAGO);  // Fecha o ticket
-        ticket.setValor(valorPagamento);  // Define o valor a ser pago
+        ticket.setFim(agora);
+        ticket.setStatus(EnumStatusTicket.PAGO);
+        ticket.setValor(valorPagamento);
 
         // Salva o ticket atualizado no banco de dados
-        return ticketRepository.save(ticket);
+         ticketRepository.save(ticket);
+
+         return TicketPaidDTO.toDto(ticket);
     }
+
+
+    @Override
+    public TicketCancelledDTO cancelaTicket(String ticketId) {
+
+        // Encontra o ticket pelo ID
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket não encontrado"));
+
+        // Verifica se o ticket já foi pago
+        if (ticket.getStatus() != EnumStatusTicket.EM_ABERTO) {
+            throw new TicketAlreadyPaidException("Ticket já foi pago. Data do pagamento: " + ticket.getFim());
+        }
+
+        LocalDateTime agora = LocalDateTime.now();
+
+        BigDecimal valorPagamento = new BigDecimal("0.00");
+
+        // Atualiza o ticket com a hora de fechamento, o valor calculado e a data do pagamento
+        ticket.setFim(agora);
+        ticket.setStatus(EnumStatusTicket.CANCELADO);
+        ticket.setValor(valorPagamento);
+
+        // Salva o ticket atualizado no banco de dados
+        ticketRepository.save(ticket);
+
+        return TicketCancelledDTO.toDto(ticket);
+    }
+
 
     public TicketViewDTO findTicketById(String ticketId) {
         // Primeiro, encontramos o ticket pelo ID
@@ -104,22 +137,11 @@ public class TicketServiceImpl implements TicketService {
         Veiculo veiculo = ticket.getVeiculo();
         Vaga vaga = ticket.getVaga();
 
+
         // Mapear as informações para o DTO
-        return new TicketViewDTO(
-                ticket.getId(),
-                ticket.getInicio(),
-                ticket.getFim(),
-                ticket.getStatus(),
-                ticket.getValor(),
-                motorista.getCpf(),
-                motorista.getNome(),
-                veiculo.getPlaca(),
-                veiculo.getModelo(),
-                veiculo.getTipoVeiculo(),
-                vaga.getLocId(),
-                vaga.getTipoVeiculo(),
-                vaga.getEndereco()
-        );
+        return TicketViewDTO.toDto(ticket,motorista,veiculo,vaga);
+
+
     }
 }
 

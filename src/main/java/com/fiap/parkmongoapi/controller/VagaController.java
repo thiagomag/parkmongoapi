@@ -9,6 +9,7 @@ import com.fiap.parkmongoapi.model.Vaga;
 import com.fiap.parkmongoapi.model.enums.EnumPerfil;
 import com.fiap.parkmongoapi.model.enums.EnumTipoVeiculo;
 import com.fiap.parkmongoapi.service.VagaService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +29,34 @@ public class VagaController {
     private VagaService vagaService;
 
     @PostMapping
-    public ResponseEntity<Vaga> criarVaga(@Valid @RequestBody CadastroVagaDTO vaga) {
+    @Operation(summary = "Criar uma nova vaga",
+            description = "Cria uma nova vaga com as informações fornecidas no corpo da requisição.")
+    public ResponseEntity<VagaResponseDTO> criarVaga(@Valid @RequestBody CadastroVagaDTO vaga) {
 
         Vaga vagaCriada = vagaService.criarVaga(vaga);
-        return ResponseEntity.ok(vagaCriada);
+
+        var dto = VagaResponseDTO.toDto(vagaCriada);
+
+        return ResponseEntity.ok(dto);
     }
 
 
     @PutMapping("/{identificador}")
-    public ResponseEntity<Vaga> atualizarVaga(@PathVariable String identificador,
+    @Operation(summary = "Atualizar uma vaga existente",
+            description = "Atualiza os dados de uma vaga existente com base no identificador fornecido.")
+    public ResponseEntity<VagaResponseDTO> atualizarVaga(@PathVariable String identificador,
                                               @Valid @RequestBody AtualizaVagaDTO vagaDTO) {
 
         Vaga vagaAtualizada = vagaService.atualizarVaga(identificador, vagaDTO);
 
-        return ResponseEntity.ok(vagaAtualizada);
+        var dto = VagaResponseDTO.toDto(vagaAtualizada);
+
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{identificador}")
+    @Operation(summary = "Deletar uma vaga",
+            description = "Deleta uma vaga com base no identificador fornecido.")
     public ResponseEntity<Void> deletarVaga(@PathVariable String identificador) {
         vagaService.deletarVaga(identificador);
         return ResponseEntity.noContent().build();
@@ -52,6 +64,8 @@ public class VagaController {
 
     // Get para os parametros cep, cidade, uf, perfil e tipo veiculo
     @GetMapping
+    @Operation(summary = "Buscar vagas com filtros",
+            description = "Busca vagas com base nos filtros fornecidos como parâmetros de consulta.")
     public ResponseEntity<PageResponseDTO<VagaResponseDTO>> buscarComFiltros(
             @RequestParam(required = false) String cep,
             @RequestParam(required = false) String cidade,

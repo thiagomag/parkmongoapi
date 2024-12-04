@@ -3,6 +3,7 @@ package com.fiap.parkmongoapi.service.impl;
 
 import com.fiap.parkmongoapi.dto.PageResponseDTO;
 import com.fiap.parkmongoapi.dto.veiculo.AtualizaVeiculoDTO;
+import com.fiap.parkmongoapi.dto.veiculo.VeiculoResponseDTO;
 import com.fiap.parkmongoapi.exception.MotoristaNotFoundException;
 import com.fiap.parkmongoapi.exception.VeiculoNotFoundException;
 import com.fiap.parkmongoapi.model.Motorista;
@@ -146,7 +147,7 @@ public class VeiculoServiceImpl implements VeiculoService {
     }
 
     @Override
-    public PageResponseDTO<Veiculo> consultarVeiculosPorMotorista(
+    public PageResponseDTO<VeiculoResponseDTO> consultarVeiculosPorMotorista(
             String cpfMotorista, Pageable pageable){
 
 
@@ -155,13 +156,17 @@ public class VeiculoServiceImpl implements VeiculoService {
                 ()-> new MotoristaNotFoundException("Motorista não encontrado")
         );
 
+        // Converte a página de Veiculo para VeiculoResponseDTO
+        Page<VeiculoResponseDTO> veiculoResponseDTOPage = veiculosPage.map(VeiculoResponseDTO::toDTO);
+
+
         // Retorna a resposta com os dados da página
         return new PageResponseDTO<>(
-                veiculosPage.getContent(),
-                veiculosPage.getTotalElements(),
-                veiculosPage.getTotalPages(),
-                veiculosPage.getNumber(),
-                veiculosPage.getSize()  );
+                veiculoResponseDTOPage.getContent(),
+                veiculoResponseDTOPage.getTotalElements(),
+                veiculoResponseDTOPage.getTotalPages(),
+                veiculoResponseDTOPage.getNumber(),
+                veiculoResponseDTOPage.getSize()  );
     }
 }
 

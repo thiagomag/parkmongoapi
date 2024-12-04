@@ -2,6 +2,7 @@ package com.fiap.parkmongoapi.service;
 
 import com.fiap.parkmongoapi.dto.PageResponseDTO;
 import com.fiap.parkmongoapi.dto.veiculo.AtualizaVeiculoDTO;
+import com.fiap.parkmongoapi.dto.veiculo.VeiculoResponseDTO;
 import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.model.Veiculo;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,9 @@ public interface VeiculoService {
     // Consultar um veículo pela placa e CPF do motorista
     public Veiculo consultarVeiculoPorPlacaEMotorista(String cpf,String placa );
 
-    public PageResponseDTO<Veiculo> consultarVeiculosPorMotorista(String cpfMotorista, Pageable pageable);
+    // Consultar um veiculo pelo cpf do motorista
+    public PageResponseDTO<VeiculoResponseDTO> consultarVeiculosPorMotorista(
+            String cpfMotorista, Pageable pageable);
 }
 
 

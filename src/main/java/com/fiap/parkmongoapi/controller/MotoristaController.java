@@ -2,6 +2,7 @@ package com.fiap.parkmongoapi.controller;
 
 import com.fiap.parkmongoapi.dto.motorista.AtualizaMotoristaDTO;
 import com.fiap.parkmongoapi.dto.motorista.CadastroMotoristaDTO;
+import com.fiap.parkmongoapi.dto.motorista.MotoristaResponseDTO;
 import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.service.MotoristaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,22 +28,24 @@ public class MotoristaController {
     @GetMapping("/{cpf}")
     @Operation(summary = "Consultar Motorista por CPF",
             description = "Retorna um motorista com base no CPF fornecido.")
-    public ResponseEntity<Motorista> consultarMotoristaPorCpf(
+    public ResponseEntity<MotoristaResponseDTO> consultarMotoristaPorCpf(
             @PathVariable
             @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
             String cpf){
 
         var motorista = this.motoristaService.consultarMotoristaPorCpf(cpf);
+        var dto = MotoristaResponseDTO.toDTO(motorista);
 
-        return ResponseEntity.ok(motorista);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
     @Operation(summary = "Cadastrar Motorista", description = "Cadastra um novo motorista.")
-    public ResponseEntity<Motorista> cadastrarMotorista(
+    public ResponseEntity<MotoristaResponseDTO> cadastrarMotorista(
             @Valid @RequestBody CadastroMotoristaDTO motoristaDTO){
 
         var motorista = motoristaService.cadastrarMotorista(motoristaDTO.toEntity());
+        var dto = MotoristaResponseDTO.toDTO(motorista);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -50,12 +53,12 @@ public class MotoristaController {
                 .buildAndExpand(motorista.getCpf())
                 .toUri();
 
-        return ResponseEntity.created(location).body(motorista);
+        return ResponseEntity.created(location).body(dto);
     }
 
     @PutMapping("/{cpf}")
     @Operation(summary = "Atualizar Motorista", description = "Atualiza os dados de um motorista.")
-    public ResponseEntity<Motorista> atualizarMotorista(
+    public ResponseEntity<MotoristaResponseDTO> atualizarMotorista(
             @PathVariable
             @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
             String cpf,
@@ -67,20 +70,22 @@ public class MotoristaController {
                 new ArrayList<>());
 
         var motoristaAtualizado = motoristaService.atualizarMotorista(cpf,motorista);
+        var dto = MotoristaResponseDTO.toDTO(motoristaAtualizado);
 
-        return ResponseEntity.ok(motoristaAtualizado);
+
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{cpf}")
     @Operation(summary = "Deletar Motorista", description = "Deleta um motorista.")
-    public ResponseEntity<String> deletarMotorista(
+    public ResponseEntity<Void> deletarMotorista(
             @PathVariable
             @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
             String cpf){
 
         this.motoristaService.deletarMotorista(cpf);
 
-        return ResponseEntity.ok("Motorista com CPF " + cpf + " deletado com sucesso.");
+        return ResponseEntity.noContent().build();
     }
 
 
