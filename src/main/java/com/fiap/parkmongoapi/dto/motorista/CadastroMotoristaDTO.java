@@ -2,6 +2,7 @@ package com.fiap.parkmongoapi.dto.motorista;
 
 import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.model.enums.EnumPerfil;
+import com.fiap.parkmongoapi.validations.ValidCpf;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
@@ -13,7 +14,7 @@ public record CadastroMotoristaDTO(
 
         @Schema(description = "CPF do motorista.", example = "12345678901")
         @NotBlank(message = "O CPF é obrigatório.")
-        @Size(min = 11, max = 11, message = "O CPF deve ter 11 dígitos")
+        @ValidCpf
         String cpf,
 
         @Schema(description = "Nome completo do motorista.", example = "João da Silva")

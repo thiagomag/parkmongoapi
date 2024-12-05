@@ -5,12 +5,13 @@ import com.fiap.parkmongoapi.dto.motorista.CadastroMotoristaDTO;
 import com.fiap.parkmongoapi.dto.motorista.MotoristaResponseDTO;
 import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.service.MotoristaService;
+import com.fiap.parkmongoapi.validations.ValidCpf;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 
 @RestController
 @RequestMapping(value = "/motorista")
+@Validated
 @Tag(name = "Motorista", description = "API para gerenciar motoristas")
 public class MotoristaController {
 
@@ -29,9 +31,7 @@ public class MotoristaController {
     @Operation(summary = "Consultar Motorista por CPF",
             description = "Retorna um motorista com base no CPF fornecido.")
     public ResponseEntity<MotoristaResponseDTO> consultarMotoristaPorCpf(
-            @PathVariable
-            @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
-            String cpf){
+            @PathVariable @Valid @ValidCpf String cpf){
 
         var motorista = this.motoristaService.consultarMotoristaPorCpf(cpf);
         var dto = MotoristaResponseDTO.toDTO(motorista);
@@ -59,9 +59,7 @@ public class MotoristaController {
     @PutMapping("/{cpf}")
     @Operation(summary = "Atualizar Motorista", description = "Atualiza os dados de um motorista.")
     public ResponseEntity<MotoristaResponseDTO> atualizarMotorista(
-            @PathVariable
-            @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
-            String cpf,
+            @PathVariable @Valid @ValidCpf String cpf,
             @RequestBody @Valid AtualizaMotoristaDTO atualizacaoMotorista) {
 
         var motorista = new Motorista(cpf, atualizacaoMotorista.nome(),
@@ -79,9 +77,7 @@ public class MotoristaController {
     @DeleteMapping("/{cpf}")
     @Operation(summary = "Deletar Motorista", description = "Deleta um motorista.")
     public ResponseEntity<Void> deletarMotorista(
-            @PathVariable
-            @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
-            String cpf){
+            @PathVariable @Valid @ValidCpf String cpf){
 
         this.motoristaService.deletarMotorista(cpf);
 

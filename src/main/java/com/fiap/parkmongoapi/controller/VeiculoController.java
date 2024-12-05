@@ -7,6 +7,7 @@ import com.fiap.parkmongoapi.dto.veiculo.CadastroVeiculoDTO;
 import com.fiap.parkmongoapi.dto.veiculo.VeiculoResponseDTO;
 import com.fiap.parkmongoapi.model.Veiculo;
 import com.fiap.parkmongoapi.service.VeiculoService;
+import com.fiap.parkmongoapi.validations.ValidCpf;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -32,9 +33,7 @@ public class VeiculoController {
     @PostMapping("/{cpfMotorista}")
     @Operation(summary = "Cadastrar Veiculos de Motorista", description = "Cadastra um novo veiculo vinculado a um cpf.")
     public ResponseEntity<MotoristaResponseDTO> cadastrarVeiculos(
-            @PathVariable
-            @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
-            String cpfMotorista,
+            @PathVariable @Valid @ValidCpf String cpfMotorista,
             @Valid @RequestBody CadastroVeiculoDTO veiculoDTO){
 
         var veiculo = new Veiculo();
@@ -60,7 +59,7 @@ public class VeiculoController {
     @Operation(summary = "Atualizar um o Veiculo de um Motorista por placa",
             description = "Retorna o Veiculo atualizado")
     public ResponseEntity<VeiculoResponseDTO> atualizarVeiculo(
-            @PathVariable String cpfMotorista,
+            @PathVariable @Valid @ValidCpf String cpfMotorista,
             @PathVariable String placa,
             @RequestBody AtualizaVeiculoDTO veiculoAtualizado) {
 
@@ -76,7 +75,7 @@ public class VeiculoController {
     @Operation(summary = "Deleta um o Veiculo de um Motorista por placa",
             description = "Deleta um Veiculo de um Motorista por placa")
     public ResponseEntity<Void> deletarVeiculo (
-            @PathVariable String cpfMotorista,
+            @PathVariable @Valid @ValidCpf String cpfMotorista,
             @PathVariable String placa){
 
         this.veiculoService.deletarVeiculo(cpfMotorista, placa);
@@ -88,7 +87,7 @@ public class VeiculoController {
     @DeleteMapping("/motorista/{cpfMotorista}")
     @Operation(summary = "Excluir todos os veículos de um motorista",
             description = "Exclui todos os veículos associados a um CPF de motorista.")
-    public ResponseEntity<Void> deleteByCpfMotorista(@PathVariable String cpfMotorista) {
+    public ResponseEntity<Void> deleteByCpfMotorista(@PathVariable @Valid @ValidCpf String cpfMotorista) {
         veiculoService.deleteByCpfMotorista(cpfMotorista);
         return ResponseEntity.noContent().build();
     }
@@ -111,7 +110,7 @@ public class VeiculoController {
     @Operation(summary = "Consultar Veiculo de um motorista por placa",
             description = "Retorna um veiculo  de um motorista com base na placa fornecido.")
     public ResponseEntity<VeiculoResponseDTO> consultarVeiculoPorPlacaEMotorista(
-            @PathVariable String cpfMotorista,
+            @PathVariable @Valid @ValidCpf String cpfMotorista,
             @PathVariable String placa){
 
         var veiculo = this.veiculoService.consultarVeiculoPorPlacaEMotorista(cpfMotorista,placa);
@@ -124,7 +123,7 @@ public class VeiculoController {
     @Operation(summary = "Consultar Todos Veiculos de um motorista",
             description = "Retorna todos os veiculos associados a um cpf de um motorista.")
     public ResponseEntity<PageResponseDTO<VeiculoResponseDTO>>  consultarVeiculosPorMotorista(
-            @PathVariable String cpfMotorista,
+            @PathVariable @Valid @ValidCpf String cpfMotorista,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 

@@ -1,6 +1,6 @@
 package com.fiap.parkmongoapi.utils;
 
-import com.fiap.parkmongoapi.exception.VagaNotFoundException;
+import com.fiap.parkmongoapi.exception.vaga.VagaNotFoundException;
 import com.fiap.parkmongoapi.model.Endereco;
 import com.fiap.parkmongoapi.model.Vaga;
 import com.fiap.parkmongoapi.model.counter.EnderecoCounter;
@@ -51,8 +51,7 @@ public class VagaUtils {
         }
 
         // Se ainda não encontrou, lança a exceção
-        return vagaOptional.orElseThrow(() -> new VagaNotFoundException("Vaga com identificador "
-                + identificador + " não encontrada."));
+        return vagaOptional.orElseThrow(() -> new VagaNotFoundException(identificador));
     }
 
 

@@ -1,7 +1,7 @@
 package com.fiap.parkmongoapi.service.impl;
 
-import com.fiap.parkmongoapi.exception.MotoristaAlreadyExistsException;
-import com.fiap.parkmongoapi.exception.MotoristaNotFoundException;
+import com.fiap.parkmongoapi.exception.motorista.MotoristaAlreadyExistsException;
+import com.fiap.parkmongoapi.exception.motorista.MotoristaNotFoundException;
 import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.repository.MotoristaRepository;
 import com.fiap.parkmongoapi.service.MotoristaService;
@@ -19,7 +19,7 @@ public class MotoristaServiceImpl implements MotoristaService {
     @Override
     public Motorista consultarMotoristaPorCpf(String cpf) {
         return motoristaRepository.findById(cpf)
-                .orElseThrow(() -> new MotoristaNotFoundException("Motorista não encontrado com CPF: " + cpf));
+                .orElseThrow(() -> new MotoristaNotFoundException(cpf));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class MotoristaServiceImpl implements MotoristaService {
     @Override
     public Motorista atualizarMotorista(String cpf, Motorista motoristaAtualizado) {
         Motorista motoristaExistente = motoristaRepository.findById(cpf)
-                .orElseThrow(() -> new MotoristaNotFoundException("Motorista não encontrado com o CPF: " + cpf));
+                .orElseThrow(() -> new MotoristaNotFoundException(cpf));
 
         // Atualizar campos individualmente, se fornecidos
         if (motoristaAtualizado.getEmail() != null) {
@@ -56,7 +56,7 @@ public class MotoristaServiceImpl implements MotoristaService {
     @Override
     public void deletarMotorista(String cpf) {
         Motorista motoristaExistente = motoristaRepository.findById(cpf)
-                .orElseThrow(() -> new MotoristaNotFoundException("Motorista não encontrado com o CPF: " + cpf));
+                .orElseThrow(() -> new MotoristaNotFoundException(cpf));
 
         motoristaRepository.delete(motoristaExistente);
     }

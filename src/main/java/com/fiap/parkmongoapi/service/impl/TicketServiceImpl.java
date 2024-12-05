@@ -1,8 +1,10 @@
 package com.fiap.parkmongoapi.service.impl;
 
 import com.fiap.parkmongoapi.dto.ticket.*;
-import com.fiap.parkmongoapi.exception.TicketAlreadyPaidException;
-import com.fiap.parkmongoapi.exception.TicketNotFoundException;
+import com.fiap.parkmongoapi.exception.motorista.MotoristaNotFoundException;
+import com.fiap.parkmongoapi.exception.ticket.TicketAlreadyCancelledException;
+import com.fiap.parkmongoapi.exception.ticket.TicketAlreadyPaidException;
+import com.fiap.parkmongoapi.exception.ticket.TicketNotFoundException;
 import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.model.Ticket;
 import com.fiap.parkmongoapi.model.Vaga;
@@ -45,7 +47,7 @@ public class TicketServiceImpl implements TicketService {
         Vaga vaga = VagaUtils.buscarVagaPorIdentificador(cadastroTicketDTO.vagaId(), vagaRepository);
 
         Motorista motorista = motoristaRepository.findById(cadastroTicketDTO.motoristacpf())
-                .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
+                .orElseThrow(() -> new MotoristaNotFoundException(cadastroTicketDTO.motoristacpf()));
 
         Veiculo veiculo = VeiculoUtils.buscarVeiculoPorIdOuPlaca(cadastroTicketDTO.veiculoPlaca(),
                 cadastroTicketDTO.motoristacpf(), veiculoRepository);
@@ -72,11 +74,16 @@ public class TicketServiceImpl implements TicketService {
     public TicketPaidDTO pagarTicket(String ticketId) {
         // Encontra o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new TicketNotFoundException("Ticket não encontrado"));
+                .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
         // Verifica se o ticket já foi pago
         if (ticket.getStatus() == EnumStatusTicket.PAGO) {
-            throw new TicketAlreadyPaidException("Ticket já foi pago. Data do pagamento: " + ticket.getFim());
+            throw new TicketAlreadyPaidException(ticketId ,ticket.getFim());
+        }
+
+        // Verifica se o ticket já foi Cancelado
+        if (ticket.getStatus() == EnumStatusTicket.CANCELADO) {
+            throw new TicketAlreadyCancelledException(ticketId, ticket.getFim());
         }
 
         // Obtém a hora de início e a hora atual
@@ -104,11 +111,11 @@ public class TicketServiceImpl implements TicketService {
 
         // Encontra o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new TicketNotFoundException("Ticket não encontrado"));
+                .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
         // Verifica se o ticket já foi pago
         if (ticket.getStatus() != EnumStatusTicket.EM_ABERTO) {
-            throw new TicketAlreadyPaidException("Ticket já foi pago. Data do pagamento: " + ticket.getFim());
+            throw new TicketAlreadyPaidException( ticketId, ticket.getFim());
         }
 
         LocalDateTime agora = LocalDateTime.now();
@@ -130,7 +137,7 @@ public class TicketServiceImpl implements TicketService {
     public TicketViewDTO findTicketById(String ticketId) {
         // Primeiro, encontramos o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new TicketNotFoundException("Ticket não encontrado"));
+                .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
         // Buscando os dados relacionados (Motorista, Veículo, Vaga)
         Motorista motorista = ticket.getMotorista();

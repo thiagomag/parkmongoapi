@@ -1,8 +1,6 @@
 package com.fiap.parkmongoapi.controller;
 
-
 import com.fiap.parkmongoapi.dto.ticket.*;
-import com.fiap.parkmongoapi.model.Ticket;
 import com.fiap.parkmongoapi.service.TicketService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,10 +62,6 @@ public class TicketController {
         var ticketDetalhe = ticketService.findTicketById(id);
         return ResponseEntity.ok(ticketDetalhe);
     }
-
-
-
-
 }
 
 
