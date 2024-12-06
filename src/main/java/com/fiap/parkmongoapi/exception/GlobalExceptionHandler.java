@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    /*@ExceptionHandler(Exception.class)
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseError> handleGenericException(Exception ex) {
         ResponseError error = new ResponseError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -129,7 +129,7 @@ public class GlobalExceptionHandler {
                 List.of(ex.getMessage() != null ? ex.getMessage() : "Erro desconhecido.")
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
+    }
 
 
 
