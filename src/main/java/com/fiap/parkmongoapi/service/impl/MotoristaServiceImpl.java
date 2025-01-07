@@ -5,16 +5,16 @@ import com.fiap.parkmongoapi.exception.motorista.MotoristaNotFoundException;
 import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.repository.MotoristaRepository;
 import com.fiap.parkmongoapi.service.MotoristaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class MotoristaServiceImpl implements MotoristaService {
 
-    @Autowired
-    private MotoristaRepository motoristaRepository;
+    private final MotoristaRepository motoristaRepository;
 
     @Override
     public Motorista consultarMotoristaPorCpf(String cpf) {

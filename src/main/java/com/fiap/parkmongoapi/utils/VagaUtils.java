@@ -6,16 +6,16 @@ import com.fiap.parkmongoapi.model.Vaga;
 import com.fiap.parkmongoapi.model.counter.EnderecoCounter;
 import com.fiap.parkmongoapi.repository.VagaRepository;
 import com.fiap.parkmongoapi.repository.counterRepository.EnderecoCounterRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class VagaUtils {
 
-    @Autowired
-    private EnderecoCounterRepository enderecoCounterRepository;
+    private final EnderecoCounterRepository enderecoCounterRepository;
 
     public String gerarIdCustomizado(Endereco endereco) {
         // Gera o hash do endereço

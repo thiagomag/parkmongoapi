@@ -5,13 +5,12 @@ import com.fiap.parkmongoapi.dto.vaga.AtualizaVagaDTO;
 import com.fiap.parkmongoapi.dto.vaga.CadastroVagaDTO;
 import com.fiap.parkmongoapi.dto.vaga.VagaFiltroDTO;
 import com.fiap.parkmongoapi.dto.vaga.VagaResponseDTO;
-
 import com.fiap.parkmongoapi.model.Endereco;
 import com.fiap.parkmongoapi.model.Vaga;
 import com.fiap.parkmongoapi.repository.VagaRepository;
 import com.fiap.parkmongoapi.service.VagaService;
 import com.fiap.parkmongoapi.utils.VagaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,16 +20,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class VagaServiceImpl implements VagaService {
 
-    @Autowired
-    private VagaRepository vagaRepository;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @Autowired
-    private VagaUtils vagaUtils;
+    private final VagaRepository vagaRepository;
+    private final MongoTemplate mongoTemplate;
+    private final VagaUtils vagaUtils;
 
     @Override
     public Vaga criarVaga(CadastroVagaDTO vaga) {

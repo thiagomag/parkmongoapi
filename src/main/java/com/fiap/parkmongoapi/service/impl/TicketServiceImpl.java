@@ -1,6 +1,10 @@
 package com.fiap.parkmongoapi.service.impl;
 
-import com.fiap.parkmongoapi.dto.ticket.*;
+import com.fiap.parkmongoapi.dto.ticket.CadastroTicketDTO;
+import com.fiap.parkmongoapi.dto.ticket.TicketCancelledDTO;
+import com.fiap.parkmongoapi.dto.ticket.TicketCreatedDTO;
+import com.fiap.parkmongoapi.dto.ticket.TicketPaidDTO;
+import com.fiap.parkmongoapi.dto.ticket.TicketViewDTO;
 import com.fiap.parkmongoapi.exception.motorista.MotoristaNotFoundException;
 import com.fiap.parkmongoapi.exception.ticket.TicketAlreadyCancelledException;
 import com.fiap.parkmongoapi.exception.ticket.TicketAlreadyPaidException;
@@ -18,7 +22,7 @@ import com.fiap.parkmongoapi.service.TicketService;
 import com.fiap.parkmongoapi.utils.TicketUtils;
 import com.fiap.parkmongoapi.utils.VagaUtils;
 import com.fiap.parkmongoapi.utils.VeiculoUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,19 +32,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
-    @Autowired
-    private TicketRepository ticketRepository;
-
-    @Autowired
-    private VagaRepository vagaRepository;
-
-    @Autowired
-    private MotoristaRepository motoristaRepository;
-
-    @Autowired
-    private VeiculoRepository veiculoRepository;
+    private final TicketRepository ticketRepository;
+    private final VagaRepository vagaRepository;
+    private final MotoristaRepository motoristaRepository;
+    private final VeiculoRepository veiculoRepository;
 
     public TicketCreatedDTO cadastrarTicket(CadastroTicketDTO cadastroTicketDTO) {
 

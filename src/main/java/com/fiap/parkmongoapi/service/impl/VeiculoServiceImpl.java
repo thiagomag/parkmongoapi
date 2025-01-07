@@ -12,7 +12,7 @@ import com.fiap.parkmongoapi.model.Veiculo;
 import com.fiap.parkmongoapi.repository.MotoristaRepository;
 import com.fiap.parkmongoapi.repository.VeiculoRepository;
 import com.fiap.parkmongoapi.service.VeiculoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,13 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class VeiculoServiceImpl implements VeiculoService {
 
-    @Autowired
-    private MotoristaRepository motoristaRepository;
-
-    @Autowired
-    private VeiculoRepository veiculoRepository;
+    private final MotoristaRepository motoristaRepository;
+    private final VeiculoRepository veiculoRepository;
 
 
     @Override
