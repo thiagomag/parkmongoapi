@@ -3,7 +3,6 @@ package com.fiap.parkmongoapi.service.impl;
 import com.fiap.parkmongoapi.dto.ticket.CadastroTicketDTO;
 import com.fiap.parkmongoapi.dto.ticket.TicketCancelledDTO;
 import com.fiap.parkmongoapi.dto.ticket.TicketCreatedDTO;
-import com.fiap.parkmongoapi.dto.ticket.TicketPaidDTO;
 import com.fiap.parkmongoapi.dto.ticket.TicketViewDTO;
 import com.fiap.parkmongoapi.exception.motorista.MotoristaNotFoundException;
 import com.fiap.parkmongoapi.exception.ticket.TicketAlreadyCancelledException;
@@ -69,7 +68,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketPaidDTO pagarTicket(String ticketId) {
+    public void pagarTicket(String ticketId) {
         // Encontra o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
@@ -99,8 +98,6 @@ public class TicketServiceImpl implements TicketService {
 
         // Salva o ticket atualizado no banco de dados
          ticketRepository.save(ticket);
-
-         return TicketPaidDTO.toDto(ticket);
     }
 
 
