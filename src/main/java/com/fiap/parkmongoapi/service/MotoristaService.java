@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 public interface MotoristaService {
 
     // Consultar um motorista pelo CPF
-    public Motorista consultarMotoristaPorCpf(String cpf);
+    Motorista consultarMotoristaPorCpf(String cpf);
 
     // Cadastrar um motorista
-    public Motorista cadastrarMotorista(Motorista motorista);
+    Motorista cadastrarMotorista(Motorista motorista);
 
     // Atualizar dados de um motorista
-    public Motorista atualizarMotorista(String cpf, Motorista motoristaAtualizado);
+    Motorista atualizarMotorista(String cpf, Motorista motoristaAtualizado);
 
     // Deletar um motorista
-    public void deletarMotorista(String cpf);
+    void deletarMotorista(String cpf);
 
 }
 
