@@ -4,10 +4,9 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableFeignClients
 @OpenAPIDefinition(
 		info = @Info(
 				title = "Park Mongo API - PósTech FIAP",
@@ -15,6 +14,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 				description = "API de consulta de parquímetro - FIAP"
 		)
 )
+@EnableFeignClients
 public class ParkmongoapiApplication {
 
 

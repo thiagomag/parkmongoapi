@@ -6,10 +6,11 @@ import com.fiap.parkmongoapi.model.Motorista;
 import com.fiap.parkmongoapi.repository.MotoristaRepository;
 import com.fiap.parkmongoapi.service.MotoristaService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MotoristaServiceImpl implements MotoristaService {
@@ -24,6 +25,7 @@ public class MotoristaServiceImpl implements MotoristaService {
 
     @Override
     public Motorista cadastrarMotorista(Motorista motorista) {
+        log.info("Cadastrando motorista: " + motorista);
         if (motoristaRepository.existsById(motorista.getCpf())) {
             throw new MotoristaAlreadyExistsException(motorista.getCpf());
         }

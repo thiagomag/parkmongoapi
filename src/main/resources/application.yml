@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: parkmongoapi
+  data:
+    mongodb:
+      uri: mongodb://root:pass@mongo:27017/park
+
+server:
+  error:
+    include-stacktrace: never
+
