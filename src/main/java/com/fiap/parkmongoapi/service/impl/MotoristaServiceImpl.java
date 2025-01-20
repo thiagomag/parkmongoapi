@@ -34,6 +34,7 @@ public class MotoristaServiceImpl implements MotoristaService {
 
     @Override
     public Motorista atualizarMotorista(String cpf, Motorista motoristaAtualizado) {
+        log.info("Atualizando motorista: " + motoristaAtualizado);
         Motorista motoristaExistente = motoristaRepository.findById(cpf)
                 .orElseThrow(() -> new MotoristaNotFoundException(cpf));
 
@@ -57,8 +58,12 @@ public class MotoristaServiceImpl implements MotoristaService {
     @Transactional
     @Override
     public void deletarMotorista(String cpf) {
+        log.info("Deletando motorista com CPF: " + cpf);
         Motorista motoristaExistente = motoristaRepository.findById(cpf)
-                .orElseThrow(() -> new MotoristaNotFoundException(cpf));
+                .orElseThrow(() -> {
+                    log.error("Motorista com CPF " + cpf + " não encontrado.");
+                    return new MotoristaNotFoundException(cpf);
+                });
 
         motoristaRepository.delete(motoristaExistente);
     }

@@ -11,6 +11,7 @@ import com.fiap.parkmongoapi.repository.VagaRepository;
 import com.fiap.parkmongoapi.service.VagaService;
 import com.fiap.parkmongoapi.utils.VagaUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class VagaServiceImpl implements VagaService {
 
@@ -29,7 +31,7 @@ public class VagaServiceImpl implements VagaService {
 
     @Override
     public Vaga criarVaga(CadastroVagaDTO vaga) {
-
+        log.info("Criando vaga: " + vaga);
         Endereco enderecoVaga = vaga.toEndereco();
         String locId = vagaUtils.gerarIdCustomizado(enderecoVaga);
 
@@ -42,7 +44,7 @@ public class VagaServiceImpl implements VagaService {
 
     @Override
     public Vaga atualizarVaga(String identificador, AtualizaVagaDTO vagaAtualizada) {
-
+        log.info("Atualizando vaga: " + vagaAtualizada);
         Vaga vagaExistente = VagaUtils.buscarVagaPorIdentificador(identificador, vagaRepository);
 
         // Atualiza apenas os campos não nulos
@@ -62,7 +64,7 @@ public class VagaServiceImpl implements VagaService {
 
     @Override
     public void deletarVaga(String identificador) {
-
+        log.info("Deletando vaga com identificador: " + identificador);
         Vaga vaga = VagaUtils.buscarVagaPorIdentificador(identificador, vagaRepository);
 
         // Remove a vaga
@@ -72,6 +74,7 @@ public class VagaServiceImpl implements VagaService {
 
     @Override
     public PageResponseDTO<VagaResponseDTO> buscarComFiltros(VagaFiltroDTO filtro, Pageable pageable) {
+        log.info("Buscando vagas com filtros: " + filtro);
         Query query = new Query();
 
         // Adiciona filtros condicionais

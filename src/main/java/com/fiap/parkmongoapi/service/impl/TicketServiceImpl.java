@@ -22,6 +22,7 @@ import com.fiap.parkmongoapi.utils.TicketUtils;
 import com.fiap.parkmongoapi.utils.VagaUtils;
 import com.fiap.parkmongoapi.utils.VeiculoUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,6 +32,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
@@ -40,11 +42,14 @@ public class TicketServiceImpl implements TicketService {
     private final VeiculoRepository veiculoRepository;
 
     public TicketCreatedDTO cadastrarTicket(CadastroTicketDTO cadastroTicketDTO) {
-
+        log.info("Cadastrando ticket: " + cadastroTicketDTO);
         Vaga vaga = VagaUtils.buscarVagaPorIdentificador(cadastroTicketDTO.vagaId(), vagaRepository);
 
         Motorista motorista = motoristaRepository.findById(cadastroTicketDTO.motoristacpf())
-                .orElseThrow(() -> new MotoristaNotFoundException(cadastroTicketDTO.motoristacpf()));
+                .orElseThrow(() -> {
+                    log.error("Motorista não encontrado: " + cadastroTicketDTO.motoristacpf());
+                    return new MotoristaNotFoundException(cadastroTicketDTO.motoristacpf());
+                });
 
         Veiculo veiculo = VeiculoUtils.buscarVeiculoPorIdOuPlaca(cadastroTicketDTO.veiculoPlaca(),
                 cadastroTicketDTO.motoristacpf(), veiculoRepository);
@@ -69,17 +74,20 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void pagarTicket(String ticketId) {
+        log.info("Pagando ticket: " + ticketId);
         // Encontra o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
         // Verifica se o ticket já foi pago
         if (ticket.getStatus() == EnumStatusTicket.PAGO) {
+            log.error("Ticket já foi pago: " + ticketId);
             throw new TicketAlreadyPaidException(ticketId ,ticket.getFim());
         }
 
         // Verifica se o ticket já foi Cancelado
         if (ticket.getStatus() == EnumStatusTicket.CANCELADO) {
+            log.error("Ticket já foi Cancelado: " + ticketId);
             throw new TicketAlreadyCancelledException(ticketId, ticket.getFim());
         }
 
@@ -103,13 +111,17 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketCancelledDTO cancelaTicket(String ticketId) {
-
+        log.info("Cancelando ticket: " + ticketId);
         // Encontra o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new TicketNotFoundException(ticketId));
+                .orElseThrow(() -> {
+                    log.info("Ticket não encontrado: " + ticketId);
+                    return new TicketNotFoundException(ticketId);
+                });
 
         // Verifica se o ticket já foi pago
         if (ticket.getStatus() != EnumStatusTicket.EM_ABERTO) {
+            log.error("Ticket já foi pago: " + ticketId);
             throw new TicketAlreadyPaidException( ticketId, ticket.getFim());
         }
 
@@ -130,9 +142,13 @@ public class TicketServiceImpl implements TicketService {
 
 
     public TicketViewDTO findTicketById(String ticketId) {
+        log.info("Buscando ticket por ID: " + ticketId);
         // Primeiro, encontramos o ticket pelo ID
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new TicketNotFoundException(ticketId));
+                .orElseThrow(() -> {
+                    log.error("Ticket não encontrado: " + ticketId);
+                    return new TicketNotFoundException(ticketId);
+                });
 
         // Buscando os dados relacionados (Motorista, Veículo, Vaga)
         Motorista motorista = ticket.getMotorista();

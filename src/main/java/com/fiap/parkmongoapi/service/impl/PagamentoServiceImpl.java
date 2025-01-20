@@ -19,11 +19,13 @@ import com.fiap.parkmongoapi.repository.TicketRepository;
 import com.fiap.parkmongoapi.service.PagamentoService;
 import com.fiap.parkmongoapi.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PagamentoServiceImpl implements PagamentoService {
 
@@ -36,15 +38,19 @@ public class PagamentoServiceImpl implements PagamentoService {
 
     @Override
     public PagamentoResponseDTO realizarPagamento(PagamentoDTO pagamentoDTO) {
+        log.info("Realizando pagamento: " + pagamentoDTO);
         final var pagamento = buildPagamento(pagamentoDTO);
         final var pagamentoFeignClientRequest = new PagamentoFeingClientRequest(pagamentoDTO);
         final var pagamentoFeingClientResponse = pagamentoFeignClient.realizarPagamento(pagamentoFeignClientRequest);
         if (pagamentoFeingClientResponse != null && "aprovado".equalsIgnoreCase(pagamentoFeingClientResponse.getStatusPagamento())) {
+            log.info("Pagamento aprovado: " + pagamentoFeingClientResponse);
             final var pagamentoResponse = pagamentoRepository.save(pagamento);
             ticketService.pagarTicket(pagamentoDTO.ticketId());
             return PagamentoResponseDTO.toDTO(pagamentoResponse);
         }
-        throw new PagamentoErrorException("Erro ao realizar o pagamento.");
+        final var msg = "Erro ao realizar o pagamento.";
+        log.error(msg);
+        throw new PagamentoErrorException(msg);
     }
 
     private Pagamento buildPagamento(PagamentoDTO pagamentoDTO) {
@@ -59,10 +65,14 @@ public class PagamentoServiceImpl implements PagamentoService {
 
     @Override
     public PerfilPagamentoResponseDTO cadastrarPerfilPagamento(PerfilPagamentoDTO perfilPagamentoDTO) {
+        log.info("Cadastrando perfil de pagamento: " + perfilPagamentoDTO);
         final var perfilPagamentoFeingClientRequest = new PerfilPagamentoFeignClientRequest(perfilPagamentoDTO);
         final var perfilPagamentoId = pagamentoFeignClient.cadastrarPerfilPagamento(perfilPagamentoFeingClientRequest).getId();
         final var motorista = motoristaRepository.findById(perfilPagamentoDTO.cpfMotorista())
-                .orElseThrow(() -> new MotoristaNotFoundException(perfilPagamentoDTO.cpfMotorista()));
+                .orElseThrow(() -> {
+                    log.error("Motorista não encontrado.");
+                    return new MotoristaNotFoundException(perfilPagamentoDTO.cpfMotorista());
+                });
         final var perfilPagamentoResponseDTO = perfilPagamentoDTO.toEntity(motorista, perfilPagamentoId);
         final var perfilPagamento = perfilPagamentoRepository.save(perfilPagamentoResponseDTO);
         return PerfilPagamentoResponseDTO.toDto(perfilPagamento);
@@ -70,6 +80,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 
     @Override
     public ResponseEntity<Void> inativarPerfilPagamento(String idPerfilPagamento) {
+        log.info("Inativando perfil de pagamento: " + idPerfilPagamento);
         final var perfilPagamento = perfilPagamentoRepository.findById(idPerfilPagamento)
                 .orElseThrow(() -> new PerfilPagamentoNotFoundException(idPerfilPagamento));
         perfilPagamento.setIsActive(Boolean.FALSE);

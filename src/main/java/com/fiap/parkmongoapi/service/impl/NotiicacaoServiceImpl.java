@@ -30,7 +30,11 @@ public class NotiicacaoServiceImpl implements NotiicacaoService {
             final var agora = LocalDateTime.now();
             final var horarioFim = ticket.getFim();
             final var motorista = motoristaRepository.findById(ticket.getMotorista().getCpf())
-                    .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
+                    .orElseThrow(() -> {
+                        final var msg = "Motorista não encontrado";
+                        log.error(msg);
+                        return new RuntimeException(msg);
+                    });
             if (horarioFim.minusMinutes(5).isBefore(agora) && !ticket.isNotificadoPreVencimento()) {
                 this.enviarNotificacao(
                         motorista.getEmail(),
@@ -58,5 +62,6 @@ public class NotiicacaoServiceImpl implements NotiicacaoService {
         message.setSubject("Notificação de Estacionamento");
         message.setText(mensagem);
         mailSender.send(message);
+        log.info("Notificação enviada para " + email);
     }
 }
