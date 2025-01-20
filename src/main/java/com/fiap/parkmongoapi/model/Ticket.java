@@ -1,8 +1,6 @@
 package com.fiap.parkmongoapi.model;
 
 import com.fiap.parkmongoapi.model.enums.EnumStatusTicket;
-import com.mongodb.lang.Nullable;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -42,5 +40,8 @@ public class Ticket {
 
     private BigDecimal valor;
 
+    private boolean notificadoPreVencimento;
+
+    private boolean notificadoFim;
 
 }
