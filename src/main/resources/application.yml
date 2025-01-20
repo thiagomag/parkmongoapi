@@ -3,12 +3,12 @@ spring:
     name: parkmongoapi
   data:
     mongodb:
-      uri: mongodb://root:pass@mongo:27017/park
+      uri: ${SPRING_DATA_MONGODB_URI}
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${EMAIL_USER}
-    password: ${EMAIL_PASS}
+    host: ${SPRING_MAIL_HOST}
+    port: ${SPRING_MAIL_PORT}
+    username: javafiapgrupo29@gmail.com ${EMAIL_USERNAME}
+    password: wktjmmafhonbxkjn ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
