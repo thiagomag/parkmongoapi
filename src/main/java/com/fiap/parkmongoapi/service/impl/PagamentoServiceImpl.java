@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -64,6 +66,35 @@ public class PagamentoServiceImpl implements PagamentoService {
     }
 
     @Override
+    public PagamentoResponseDTO consultarPagamento(String idPagamento) {
+        log.info("Consultando pagamento: " + idPagamento);
+        final var pagamento = pagamentoRepository.findById(idPagamento)
+                .orElseThrow(() -> new PagamentoErrorException("Pagamento não encontrado."));
+        return PagamentoResponseDTO.toDTO(pagamento);
+    }
+
+    @Override
+    public List<PagamentoResponseDTO> listarPagamentos() {
+        log.info("Listando pagamentos.");
+        return pagamentoRepository.findAll()
+                .stream()
+                .map(PagamentoResponseDTO::toDTO)
+                .toList();
+    }
+
+    @Override
+    public ResponseEntity<Void> inativarPagamento(String idPagamento) {
+        log.info("Inativando pagamento: " + idPagamento);
+        final var pagamento = pagamentoRepository.findById(idPagamento)
+                .orElseThrow(() -> new PagamentoErrorException("Pagamento não encontrado."));
+        pagamento.setStatusPagamento("cancelado");
+        pagamentoRepository.save(pagamento);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    @Override
     public PerfilPagamentoResponseDTO cadastrarPerfilPagamento(PerfilPagamentoDTO perfilPagamentoDTO) {
         log.info("Cadastrando perfil de pagamento: " + perfilPagamentoDTO);
         final var perfilPagamentoFeingClientRequest = new PerfilPagamentoFeignClientRequest(perfilPagamentoDTO);
@@ -76,6 +107,23 @@ public class PagamentoServiceImpl implements PagamentoService {
         final var perfilPagamentoResponseDTO = perfilPagamentoDTO.toEntity(motorista, perfilPagamentoId);
         final var perfilPagamento = perfilPagamentoRepository.save(perfilPagamentoResponseDTO);
         return PerfilPagamentoResponseDTO.toDto(perfilPagamento);
+    }
+
+    @Override
+    public PerfilPagamentoResponseDTO consultarPerfilPagamento(String idPerfilPagamento) {
+        log.info("Consultando perfil de pagamento: " + idPerfilPagamento);
+        final var perfilPagamento = perfilPagamentoRepository.findById(idPerfilPagamento)
+                .orElseThrow(() -> new PerfilPagamentoNotFoundException(idPerfilPagamento));
+        return PerfilPagamentoResponseDTO.toDto(perfilPagamento);
+    }
+
+    @Override
+    public List<PerfilPagamentoResponseDTO> listarPerfisPagamento() {
+        log.info("Listando perfis de pagamento.");
+        final var perfisPagamento = perfilPagamentoRepository.findAll();
+        return perfisPagamento.stream()
+                .map(PerfilPagamentoResponseDTO::toDto)
+                .toList();
     }
 
     @Override
